@@ -1,7 +1,10 @@
 use rand::Rng;
 
+trait SortTraits: Clone + std::fmt::Debug + std::cmp::PartialOrd {}
+impl<T: Clone + std::fmt::Debug + std::cmp::PartialOrd> SortTraits for T {}
+
 #[allow(dead_code)]
-fn sort<T: Clone>(x: &Vec<T>) -> Vec<T> {
+fn sort<T: SortTraits>(x: &Vec<T>) -> Vec<T> {
     let mut y: Vec<T> = Vec::new();
     for i in 0..x.len() {
         y.push(x[i].clone());
@@ -28,20 +31,15 @@ fn bubble_sort<T: Clone + std::cmp::PartialOrd>(x: &Vec<T>) -> Vec<T> {
 }
 
 #[allow(dead_code)]
-fn quick_sort<T: Clone + std::fmt::Debug + std::cmp::PartialOrd>(x: &Vec<T>) -> Vec<T> {
+fn quick_sort<T: SortTraits>(x: &Vec<T>) -> Vec<T> {
     // Sorts a (portion of an) array, divides it into partitions, then sorts those
-    fn quicksort<T: Clone + std::fmt::Debug + std::cmp::PartialOrd>(
-        a: &mut Vec<T>,
-        lo: i32,
-        hi: i32,
-    ) {
+    fn quicksort<T: SortTraits>(a: &mut Vec<T>, lo: i32, hi: i32) {
         // Ensure indices are in correct order
         if lo >= hi || lo < 0 {
             return;
         }
 
         // Partition array and get the pivot index
-        //
         let l = usize::try_from(lo).unwrap();
         let h = usize::try_from(hi).unwrap();
         let p = partition(a, l, h);
@@ -51,11 +49,7 @@ fn quick_sort<T: Clone + std::fmt::Debug + std::cmp::PartialOrd>(x: &Vec<T>) -> 
         quicksort(a, p + 1, hi); // Right side of pivot
     }
     // Divides array into two partitions
-    fn partition<T: Clone + std::fmt::Debug + std::cmp::PartialOrd>(
-        y: &mut Vec<T>,
-        lo: usize,
-        hi: usize,
-    ) -> i32 {
+    fn partition<T: SortTraits>(y: &mut Vec<T>, lo: usize, hi: usize) -> i32 {
         let pivot = y[hi].clone(); // Choose the last element as the pivot
         println!("partition({:?} ({lo}..{hi}))", y);
         // Temporary pivot index
