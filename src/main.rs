@@ -1,16 +1,7 @@
 use rand::Rng;
 
-trait SortTraits: Clone + std::fmt::Debug + std::cmp::PartialOrd {}
-impl<T: Clone + std::fmt::Debug + std::cmp::PartialOrd> SortTraits for T {}
-
-#[allow(dead_code)]
-fn sort<T: SortTraits>(x: &Vec<T>) -> Vec<T> {
-    let mut y: Vec<T> = Vec::new();
-    for i in 0..x.len() {
-        y.push(x[i].clone());
-    }
-    y
-}
+trait SortTraits: Clone + std::fmt::Debug + std::fmt::Display + std::cmp::PartialOrd {}
+impl<T: Clone + std::fmt::Debug + std::fmt::Display + std::cmp::PartialOrd> SortTraits for T {}
 
 #[allow(dead_code)]
 fn bubble_sort<T: SortTraits>(x: &Vec<T>) -> Vec<T> {
@@ -94,30 +85,14 @@ fn quick_sort<T: SortTraits>(x: &Vec<T>) -> Vec<T> {
 }
 
 #[allow(dead_code)]
-fn quick_sort_slice<T: SortTraits>(x: &mut [T]) -> &[T] {
-    // Sorts a (portion of an) array, divides it into partitions, then sorts those
-    fn quicksort<T: SortTraits>(a: &mut [T], lo: i32, hi: i32) {
-        // Ensure indices are in correct order
-        if lo >= hi || lo < 0 {
-            return;
-        }
-
-        // Partition array and get the pivot index
-        let l = usize::try_from(lo).unwrap();
-        let h = usize::try_from(hi).unwrap();
-        let p = partition(a, l, h);
-
-        // Sort the two partitions
-        quicksort(a, lo, p - 1); // Left side of pivot
-        quicksort(a, p + 1, hi); // Right side of pivot
-    }
+fn quicksort<T: SortTraits>(a: &mut [T]) -> &[T] {
     // Divides array into two partitions
-    fn partition<T: SortTraits>(y: &mut [T], lo: usize, hi: usize) -> i32 {
+    fn partition<T: SortTraits>(y: &mut [T]) -> usize {
+        let hi = y.len() - 1;
         let pivot = y[hi].clone(); // Choose the last element as the pivot
                                    // Temporary pivot index
-        let mut i = lo;
-
-        for j in lo..hi {
+        let mut i = 0;
+        for j in 0..hi {
             // If the current element is less than or equal to the pivot
             if y[j] <= pivot {
                 // Move the temporary pivot index forward
@@ -132,23 +107,28 @@ fn quick_sort_slice<T: SortTraits>(x: &mut [T]) -> &[T] {
         let t = y[i].clone();
         y[i] = y[hi].clone();
         y[hi] = t;
-        i = i + 1;
-        i32::try_from(i).unwrap() - 1 // the pivot index
+        i + 1
     }
-
-    quicksort(x, 0, i32::try_from(x.len()).unwrap() - 1);
-    x
+    if a.len() <= 1 {
+        return a;
+    }
+    // Partition array and get the pivot index
+    let p = partition(a);
+    let hi = a.len();
+    // Sort the two partitions
+    quicksort(&mut a[0..p - 1]); // Left side of pivot
+    quicksort(&mut a[p..hi]); // Right side of pivot
+    a
 }
 
 fn main() {
     let mut rng = rand::thread_rng();
 
     println!("Hello, world!");
-    let i = (0..20).map(|_| rng.gen_range(0..20)).collect::<Vec<i32>>();
-    //let i: Vec<i32> = vec![12, 2, 19, 2, 2, 13, 10, 11, 1, 3];
+    let i = (0..20).map(|_| rng.gen_range(0..100)).collect::<Vec<i32>>();
     println!("S={:?}", &i);
-    println!("S={:?}", quick_sort(&i));
     let mut x = i.clone();
     println!("R={:?}", bubble_sort_slice(&mut x[0..20]));
-    println!("Q={:?}", quick_sort_slice(&mut i.clone()));
+    println!("S={:?}", quick_sort(&i));
+    println!("Q={:?}", quicksort(&mut i.clone()));
 }
