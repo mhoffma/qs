@@ -13,7 +13,7 @@ fn sort<T: SortTraits>(x: &Vec<T>) -> Vec<T> {
 }
 
 #[allow(dead_code)]
-fn bubble_sort<T: Clone + std::cmp::PartialOrd>(x: &Vec<T>) -> Vec<T> {
+fn bubble_sort<T: SortTraits>(x: &Vec<T>) -> Vec<T> {
     let mut y: Vec<T> = Vec::new();
     for i in 0..x.len() {
         y.push(x[i].clone());
@@ -29,7 +29,19 @@ fn bubble_sort<T: Clone + std::cmp::PartialOrd>(x: &Vec<T>) -> Vec<T> {
     }
     y
 }
-
+#[allow(dead_code)]
+fn bubble_sort_slice<T: SortTraits>(y: &mut [T]) -> &[T] {
+    for i in 0..y.len() {
+        for j in i..y.len() {
+            if y[i] > y[j] {
+                let t = y[i].clone();
+                y[i] = y[j].clone();
+                y[j] = t;
+            }
+        }
+    }
+    y
+}
 #[allow(dead_code)]
 fn quick_sort<T: SortTraits>(x: &Vec<T>) -> Vec<T> {
     // Sorts a (portion of an) array, divides it into partitions, then sorts those
@@ -51,11 +63,10 @@ fn quick_sort<T: SortTraits>(x: &Vec<T>) -> Vec<T> {
     // Divides array into two partitions
     fn partition<T: SortTraits>(y: &mut Vec<T>, lo: usize, hi: usize) -> i32 {
         let pivot = y[hi].clone(); // Choose the last element as the pivot
-        println!("partition({:?} ({lo}..{hi}))", y);
-        // Temporary pivot index
+                                   // Temporary pivot index
         let mut i = lo;
 
-        for j in lo..hi - 1 {
+        for j in lo..hi {
             // If the current element is less than or equal to the pivot
             if y[j] <= pivot {
                 // Move the temporary pivot index forward
@@ -71,7 +82,7 @@ fn quick_sort<T: SortTraits>(x: &Vec<T>) -> Vec<T> {
         y[i] = y[hi].clone();
         y[hi] = t;
         i = i + 1;
-        i32::try_from(i).unwrap() // the pivot index
+        i32::try_from(i).unwrap() - 1 // the pivot index
     }
 
     let mut y: Vec<T> = Vec::new();
@@ -86,7 +97,10 @@ fn main() {
     let mut rng = rand::thread_rng();
 
     println!("Hello, world!");
-    let i = (0..10).map(|_| rng.gen_range(0..20)).collect::<Vec<i32>>();
+    let i = (0..20).map(|_| rng.gen_range(0..20)).collect::<Vec<i32>>();
+    //let i: Vec<i32> = vec![12, 2, 19, 2, 2, 13, 10, 11, 1, 3];
     println!("S={:?}", &i);
     println!("S={:?}", quick_sort(&i));
+    let mut x = i.clone();
+    println!("R={:?}", bubble_sort_slice(&mut x[0..20]));
 }
