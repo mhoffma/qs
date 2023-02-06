@@ -95,18 +95,12 @@ fn quicksort<T: SortTraits>(a: &mut [T]) -> &[T] {
         for j in 0..hi {
             // If the current element is less than or equal to the pivot
             if y[j] <= pivot {
-                // Move the temporary pivot index forward
-                // Swap the current element with the element at the temporary pivot index
-                let t = y[i].clone();
-                y[i] = y[j].clone();
-                y[j] = t;
+                y.swap(i, j);
                 i = i + 1;
             }
         }
         // Move the pivot element to the correct pivot position (between the smaller and larger elements)
-        let t = y[i].clone();
-        y[i] = y[hi].clone();
-        y[hi] = t;
+        y.swap(i, hi);
         i + 1
     }
     if a.len() <= 1 {
